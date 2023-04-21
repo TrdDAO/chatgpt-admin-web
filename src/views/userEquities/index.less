@@ -1,0 +1,25 @@
+.form-item-label-wrap {
+	.ant-form-item-required {
+		height: auto !important;
+		position: relative;
+		padding: 0 15px;
+		box-sizing: border-box;
+		&::before{
+			position: absolute !important;
+			top: 5px;
+			left: 0;
+		}
+		&::after {
+			position: absolute !important;
+			top: 0;
+			right: 2px;
+		}
+	}
+	.label-test-desc {
+		
+	}
+	.label-test-btn  {
+		display: flex;
+		flex-direction: column;
+	}
+}

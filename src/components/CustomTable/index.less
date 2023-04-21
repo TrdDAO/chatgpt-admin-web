@@ -1,0 +1,28 @@
+.custom-layout-form {
+	background-color: #fff;
+	border-radius: 8px;
+	padding: 12px 8px;
+	margin-bottom: 10px;
+}
+.toogle-expand {
+	position: relative;
+	text-align: center;
+	color:#1677ff;
+	user-select: none;
+	cursor: pointer;
+	&::before,&::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		display: block;
+		width: 30%;
+		height: 2px;
+		background-color: rgba(22, 119, 225, .2);
+	}
+	&::before {
+		transform: translate(calc(-100% - 60px), 11px);
+	}
+	&::after {
+		transform: translate(calc(60px), -11px);
+	}
+}

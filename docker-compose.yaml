@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  chatgpt-admin:
+    build: 
+      dockerfile: Dockerfile
+      context: .
+    image: trddao/chatgpt-admin-web:latest
+    restart: always
+    ports:
+      - "8083:80"
