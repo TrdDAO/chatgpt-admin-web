@@ -23,11 +23,11 @@ const menuList = [
     path: "/subscriptions",
     icon: "user",
   },
-  {
-    title: "用户权益查询",
-    path: "/userEquities",
-    icon: "user",
-  },
+  // {
+  //   title: "用户权益查询",
+  //   path: "/userEquities",
+  //   icon: "user",
+  // },
 ];
 
 export default menuList;

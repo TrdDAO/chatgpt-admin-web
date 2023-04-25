@@ -31,7 +31,7 @@ export const editSubscription = (data, subscriptionId) => {
   });
 }
 
-export const editSubscriptionGrant = (data, subscriptionId) => {
+export const grantSubscription = (subscriptionId, data) => {
 	return request({
     url: `/api/admin/equity/subscriptions/${subscriptionId}/grant`,
     method: "put",

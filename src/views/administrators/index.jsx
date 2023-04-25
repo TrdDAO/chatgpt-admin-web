@@ -37,8 +37,15 @@ const ScriptBot = (props) => {
   const formDataDefault = {
     username: '',
     password: '',
-    phone: '',
-    email: '',
+    phoneNumber: '',
+    emailAddress: '',
+    profile: {
+      nickname: '',
+      avatarUrl: '',
+      description: '',
+      gender: null,
+      settings: [],
+    }
   }
   // 表格引用，用于触发里面的方法
   const tableRef = useRef(null);
@@ -69,12 +76,11 @@ const ScriptBot = (props) => {
     // 先校验数据，再发起请求
     await form.validateFields();
     const formData = form.getFieldsValue();
-    
-    const requestData = {
-      username: formData.username,
-      password: formData.password,
-      phoneNumber: formData.phone,
-      emailAddress: formData.email,
+    let requestData = {
+      username: formData.username.trim(),
+      password: formData.password.trim(),
+      phoneNumber: formData.phoneNumber.trim(),
+      emailAddress: formData.emailAddress.trim(),
       profile: {
         avatarUrl: formData.profile.avatarUrl || '',
         description: formData.profile.description || '',
@@ -87,6 +93,13 @@ const ScriptBot = (props) => {
         }, {}) : {},
       },
     }
+    if(!formId) {
+      requestData.disabled = true;
+    }
+    // const settings = formData.profile.settings || {};
+    // for(let [key, value] of Object.entries(settings)) {
+    //   requestData.profile.settings
+    // }
     const requestFn = formId ? editAdministrator : addAdministrator;
     setSubmitLoading(true);
     await requestFn(requestData, formId)
@@ -124,10 +137,11 @@ const ScriptBot = (props) => {
   // 编辑表单
   const handleEditForm = (record) => {
     getAdministratorDetail(record.administratorId).then((res) => {
-      // let data = {};
-      // for (let [key, value] of Object.entries(res.userInfo)) {
-      //   data[key] = value;
-      // }
+      const settings = []; 
+      for(let [key, value] of Object.entries(res.profile.settings)) {
+        settings.push({key, value})
+      }
+      res.profile.settings = settings;
       setFormId(record.administratorId);
       setFormData(res);
       form.setFieldsValue(res);
@@ -171,11 +185,27 @@ const ScriptBot = (props) => {
       fixed: "left",
     },
     {
+      title: "头像",
+      dataIndex: "avatarUrl",
+      key: "avatarUrl",
+      width: 200,
+      render: (_, record, index) => <img style={{maxWidth: '100px'}} src={record.profile.avatarUrl}/>
+    },
+    {
       title: "用户名",
       dataIndex: "username",
       key: "username",
       width: 100,
-      fixed: "left",
+    },
+    {
+      title: "昵称",
+      dataIndex: "nickname",
+      key: "nickname",
+      ellipsis: true,
+      width: 150,
+      render: (_, record, index) => <div>
+        {record.profile.nickname}
+      </div>
     },
     // {
     //   title: "用户类型",
@@ -186,23 +216,27 @@ const ScriptBot = (props) => {
     // },
     {
       title: "手机号",
-      dataIndex: "phone",
-      key: "phone",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
       ellipsis: true,
       width: 150,
     },
     {
       title: "邮箱",
-      dataIndex: "email",
-      key: "email",
+      dataIndex: "emailAddress",
+      key: "emailAddress",
       width: 150,
     },
-    // {
-    //   title: "最后登录时间",
-    //   dataIndex: "userInfo.latestLoginString",
-    //   key: "userInfo.latestLoginString",
-    //   width: 150,
-    // },
+    {
+      title: "描述",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      ellipsis: true,
+      width: 150,
+      render: (_, record, index) => <div>
+        {record.profile.description}
+      </div>
+    },
     {
       title: "禁用",
       dataIndex: "disabled",
@@ -211,15 +245,17 @@ const ScriptBot = (props) => {
         defaultChecked={record.disabled}
         checkedChildren="是"
         unCheckedChildren="否"
+        loading={record.loading}
         onChange={(checked) => {
+          tableRef.current && tableRef.current.setData(index, {loading: true});
           const requestFn = checked ? setAdministratorDisable : setAdministratorEnable;
           requestFn(record.administratorId).then((res) => {
-            console.log(res)
             messageApi.success('操作成功');
           }).catch((msg) => {
-            // console.log(record, msg)
             messageApi.error(msg || '请求失败');
-            record.disabled = !record.disabled;
+            tableRef.current && tableRef.current.setData(index, {disabled: record.disabled})
+          }).finally(() => {
+            tableRef.current && tableRef.current.setData(index, {loading: false})
           })
         }}
       />,
@@ -285,27 +321,29 @@ const ScriptBot = (props) => {
               <Input/>
             </Form.Item>
           </Col>
+          {
+            formId ? null: <Col span={6}>
+              <Form.Item
+                label="密码"
+                name="password"
+              >
+                <Input/>
+              </Form.Item>
+            </Col> 
+          }
           <Col span={6}>
             <Form.Item
-              label="密码"
-              name="password"
+              label="手机"
+              name="phoneNumber"
+              rules={[{ required: true }]}
             >
               <Input/>
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item
-              label="手机"
-              name="phone"
-              rules={[{ required: true }]}
-            >
-              <Input disabled={formId ? true : false}/>
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
               label="邮箱"
-              name="email"
+              name="emailAddress"
             >
               <Input/>
             </Form.Item>
@@ -313,6 +351,14 @@ const ScriptBot = (props) => {
         </Row>
         
         <Row gutter={24}>
+        <Col span={6}>
+            <Form.Item
+              label="昵称"
+              name={['profile', 'nickname']}
+            >
+              <Input/>
+            </Form.Item>
+          </Col>
           <Col span={6}>
             <Form.Item
               label="头像连接"
@@ -334,17 +380,12 @@ const ScriptBot = (props) => {
               label="性别"
               name={['profile', 'gender']}
             >
-              <Input/>
+              <Select
+                options={[{ value: 'Male', label: '男' },{ value: 'Female', label: '女' }]}
+              />
             </Form.Item>
           </Col>
-          <Col span={6}>
-            <Form.Item
-              label="昵称"
-              name={['profile', 'nickname']}
-            >
-              <Input/>
-            </Form.Item>
-          </Col>
+          
         </Row>
             
         <Form.List name={['profile', 'settings']}>
@@ -476,7 +517,7 @@ const ScriptBot = (props) => {
       {/* 编辑窗口 */}
       {
         formDisable ? <Modal
-        title={formId ? `${formData.name}` : "新增"}
+        title={formId ? `${formData.username}` : "新增"}
         open={openModal}
         onCancel={() => setOpenModal(false)}
         footer={null}
@@ -485,7 +526,7 @@ const ScriptBot = (props) => {
       >
         {renderForm()}
       </Modal> : <Modal
-          title={formId ? `编辑-${formData.name}` : "新增"}
+          title={formId ? `编辑-${formData.username}` : "新增"}
           open={openModal}
           onOk={handleEditScript}
           confirmLoading={submitLoading}
