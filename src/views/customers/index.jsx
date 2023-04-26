@@ -37,8 +37,15 @@ const ScriptBot = (props) => {
   const formDataDefault = {
     username: '',
     password: '',
-    phone: '',
-    email: '',
+    phoneNumber: '',
+    emailAddress: '',
+    settings: {
+      nickname: '',
+      avatarUrl: '',
+      description: '',
+      gender: null,
+      settings: [],
+    }
   }
   // 表格引用，用于触发里面的方法
   const tableRef = useRef(null);
@@ -70,12 +77,12 @@ const ScriptBot = (props) => {
     await form.validateFields();
     const formData = form.getFieldsValue();
     
-    const requestData = {
+    let requestData = {
       disabled: true,
-      username: formData.username,
-      password: formData.password,
-      phoneNumber: formData.phone,
-      emailAddress: formData.email,
+      username: formData.username.trim(),
+      password: formData.password.trim(),
+      phoneNumber: formData.phoneNumber.trim(),
+      emailAddress: formData.emailAddress.trim(),
       profile: {
         avatarUrl: formData.profile.avatarUrl || '',
         description: formData.profile.description || '',
@@ -87,6 +94,9 @@ const ScriptBot = (props) => {
           return result
         }, {}) : {},
       },
+    }
+    if(!formId) {
+      requestData.disabled = false;
     }
     const requestFn = formId ? editCustomer : addCustomer;
     setSubmitLoading(true);
@@ -145,6 +155,7 @@ const ScriptBot = (props) => {
             type: "success",
             content: "删除成功",
           });
+          tableRef.current.initTable();
         }).catch(() => {
           messageApi.open({
             type: "error",
@@ -175,11 +186,41 @@ const ScriptBot = (props) => {
       fixed: "left",
     },
     {
+      title: "头像",
+      dataIndex: "profile.avatarUrl",
+      key: "profile.avatarUrl",
+      width: 100,
+      render: (_, record, index) => <img style={{maxWidth: '100px'}} src={record.profile.avatarUrl}/>
+    },
+    {
       title: "用户名",
       dataIndex: "username",
       key: "username",
       width: 100,
-      fixed: "left",
+    },
+    {
+      title: "昵称",
+      dataIndex: "profile.nickname",
+      key: "profile.nickname",
+      width: 100,
+    },
+    {
+      title: "手机号",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      ellipsis: true,
+      width: 150,
+    },
+    {
+      title: "性别",
+      dataIndex: "profile.gender",
+      key: "profile.gender",
+      width: 100,
+    },
+    {
+      title: "描述",
+      dataIndex: "profile.description",
+      key: "profile.description",
     },
     {
       title: "操作人",
@@ -188,17 +229,10 @@ const ScriptBot = (props) => {
       width: 150,
     },
     {
-      title: "手机号",
-      dataIndex: "phone",
-      key: "phone",
-      ellipsis: true,
-      width: 150,
-    },
-    {
       title: "邮箱",
       dataIndex: "email",
       key: "email",
-      width: 150,
+      width: 200,
     },
     {
       title: "禁用",
@@ -210,8 +244,8 @@ const ScriptBot = (props) => {
         unCheckedChildren="否"
         onChange={(checked) => {
           const requestFn = checked ? setCustomerDisable : setCustomerEnable;
-          requestFn(record.administratorId).then((res) => {
-            console.log(res)
+          // console.log(tableRef.current)
+          requestFn(record.customerId).then((res) => {
             messageApi.success('操作成功');
           }).catch((msg) => {
             // console.log(record, msg)
@@ -226,7 +260,7 @@ const ScriptBot = (props) => {
       title: "操作",
       dataIndex: "action",
       key: "action",
-      width: 310,
+      width: 231,
       fixed: 'right',
       render: (text, record, index) => (
         <Space>
@@ -252,7 +286,7 @@ const ScriptBot = (props) => {
             danger
             size="middle"
             onClick={() => {
-              handleDelete([record])
+              handleDelete(record.customerId)
             }}
           >
             删除
@@ -285,27 +319,29 @@ const ScriptBot = (props) => {
               <Input/>
             </Form.Item>
           </Col>
+          {
+            formId ? null: <Col span={6}>
+              <Form.Item
+                label="密码"
+                name="password"
+              >
+                <Input/>
+              </Form.Item>
+            </Col> 
+          }
           <Col span={6}>
             <Form.Item
-              label="密码"
-              name="password"
+              label="手机"
+              name="phoneNumber"
             >
               <Input/>
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item
-              label="手机"
-              name="phone"
-              rules={[{ required: true }]}
-            >
-              <Input disabled={formId ? true : false}/>
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
               label="邮箱"
-              name="email"
+              name="emailAddress"
+              rules={[{ required: true }]}
             >
               <Input/>
             </Form.Item>
@@ -313,6 +349,14 @@ const ScriptBot = (props) => {
         </Row>
         
         <Row gutter={24}>
+          <Col span={6}>
+            <Form.Item
+              label="昵称"
+              name={['profile', 'nickname']}
+            >
+              <Input/>
+            </Form.Item>
+          </Col>
           <Col span={6}>
             <Form.Item
               label="头像连接"
@@ -333,14 +377,6 @@ const ScriptBot = (props) => {
             <Form.Item
               label="性别"
               name={['profile', 'gender']}
-            >
-              <Input/>
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
-              label="昵称"
-              name={['profile', 'nickname']}
             >
               <Input/>
             </Form.Item>
@@ -417,12 +453,45 @@ const ScriptBot = (props) => {
           return getCustomers({current, size}).then((res) => {
             res.content = res.content.map((item) => {
               item.key = item.customerId;
+              for(let [key, value] of Object.entries(item.profile)) {
+                item['profile.'+key] = value;
+              }
+              item.equities = item.equities.map((equitie, equitieIndex) => {
+                equitie.key = equitieIndex;
+                equitie.effectiveTime = dayjs(equitie.effectiveTime).format('YYYY-MM-DD HH:mm:ss');
+                equitie.expiresTime = dayjs(equitie.expiresTime).format('YYYY-MM-DD HH:mm:ss');
+                for(let [key, value] of Object.entries(equitie.limitation)) {
+                  equitie['equitie.'+key] = value;
+                }
+                return equitie
+              })
               return item
             })
             return Promise.resolve(res)
           })
         }}
         showPagination
+        expandable={{
+          expandedRowRender: (record) => {
+            const columns = [
+              {title: '权益名', dataIndex: 'equityName', key: 'equityName', width: 100},
+              {title: '权益ID', dataIndex: 'equityId', key: 'equityId', width: 200},
+              {title: '类型', dataIndex: 'equityType', key: 'equityType', width: 50},
+              {title: '订阅周期', dataIndex: 'unit', key: 'unit', width: 100},
+              {title: '周期个数', dataIndex: 'quantity', key: 'quantity', width: 100},
+              {title: '生效时间', dataIndex: 'effectiveTime', key: 'effectiveTime'},
+              {title: '结束时间', dataIndex: 'expiresTime', key: 'expiresTime'},
+              {title: '单次限制', dataIndex: 'equitie.maxTokensPerRequest', key: 'equitie.maxTokensPerRequest'},
+              {title: '每日限制', dataIndex: 'equitie.maxTokensPerDay', key: 'equitie.maxTokensPerDay'},
+              {title: '每月限制', dataIndex: 'equitie.maxTokensPerMonth', key: 'equitie.maxTokensPerMonth'},
+              {title: '模型', dataIndex: 'equitie.chatModels', key: 'equitie.chatModels', render:(_, limitation) => {
+                return (<div>{_.join(' | ')}</div>)
+              }},
+            ]
+            return <Table bordered columns={columns} dataSource={record.equities} pagination={false} />;
+          },
+          rowExpandable: (record) => record.equities.length,
+        }}
         // labelCol={{ span: 5 }}
         // wrapperCol={{ span: 19 }}
         // searchConditions={

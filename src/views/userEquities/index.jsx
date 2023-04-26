@@ -155,9 +155,16 @@ const ScriptBot = (props) => {
       fixed: "left",
     },
     {
-      title: "用户权益Id",
+      title: "用户权益ID",
       dataIndex: "userEquityId",
       key: "userEquityId",
+      width: 200,
+      fixed: "left",
+    },
+    {
+      title: "所属用户ID",
+      dataIndex: "ownerUserId",
+      key: "ownerUserId",
       width: 200,
       fixed: "left",
     },

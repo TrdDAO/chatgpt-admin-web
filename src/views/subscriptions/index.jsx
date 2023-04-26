@@ -3,7 +3,7 @@ import {
   getSubscriptionDetail,
   addSubscription,
   editSubscription,
-  editSubscriptionGrant,
+  grantSubscription,
 } from '@/service/subscription';
 import CustomTable from '@/components/CustomTable';
 import {
@@ -52,8 +52,12 @@ const ScriptBot = (props) => {
   const [notificationApi, notContextHolder] = notification.useNotification();
   // 弹出框操作
   const [openModal, setOpenModal] = useState(false);
+  // 
+  const [openGrantModal, setOpenGrantModal] = useState(false);
   // 表格store，用于做表单验证赋值等操作
   const [form] = Form.useForm();
+  // 授权用户表单
+  const [grantForm] = Form.useForm();
   // 表单数据
   const [formData, setFormData] = useState(Object.assign({}, formDataDefault));
   // 禁用表单
@@ -62,6 +66,8 @@ const ScriptBot = (props) => {
   const [formId, setFormId] = useState("");
   // 提交编辑按钮loading
   const [submitLoading, setSubmitLoading] = useState(false);
+  // 授权
+  const [grantLoading, setGrantLoading] = useState(false);
   // test加载
   const [testLoading, setTestLoading] = useState(false);
 
@@ -114,6 +120,24 @@ const ScriptBot = (props) => {
     });
   };
 
+  const handleGrant = async() => {
+    await grantForm.validateFields();
+    setGrantLoading(true);
+    grantSubscription(formId, grantForm.getFieldsValue()).then(() => {
+      messageApi.open({
+        type: "success",
+        content: '授权成功',
+      });
+    }).catch(() => {
+      messageApi.open({
+        type: "error",
+        content: '授权失败',
+      });
+    }).finally(() => {
+      setGrantLoading(false);
+    })
+  }
+
   // 批量删除规则
   const handleDelete = (administratorId) => {
     // 增加一个confirm确认框是否删除
@@ -143,13 +167,6 @@ const ScriptBot = (props) => {
    */
   const columns = [
     {
-      title: "订阅名称",
-      dataIndex: "name",
-      key: "name",
-      width: 100,
-      fixed: "left",
-    },
-    {
       title: "订阅ID",
       dataIndex: "subscriptionId",
       key: "subscriptionId",
@@ -157,7 +174,14 @@ const ScriptBot = (props) => {
       fixed: "left",
     },
     {
-      title: "订阅类型",
+      title: "订阅名称",
+      dataIndex: "name",
+      key: "name",
+      width: 100,
+      fixed: "left",
+    },
+    {
+      title: "订阅周期",
       dataIndex: "type",
       key: "type",
       width: 100,
@@ -168,6 +192,15 @@ const ScriptBot = (props) => {
       dataIndex: "level",
       key: "level",
       width: 150,
+    },
+    {
+      title: "模型",
+      dataIndex: "level",
+      key: "level",
+      width: 150,
+      render: (text, record, index) => (<div>{
+        record.chatModels.join('、')
+      }</div>)
     },
     {
       title: "最大请求",
@@ -198,7 +231,7 @@ const ScriptBot = (props) => {
         unCheckedChildren="否"
         disabled
       />,
-      width: 200,
+      width: 100,
     },
     {
       title: "操作",
@@ -225,20 +258,38 @@ const ScriptBot = (props) => {
           >
             编辑
           </Button>
-          {/* |
           <Button
-            danger
+            type="primary"
             size="middle"
             onClick={() => {
-              handleDelete([record])
+              setOpenGrantModal(true);
+              setFormId(record.subscriptionId);
+              grantForm.setFieldsValue({userId: '', quantity: ''})
             }}
           >
-            删除
-          </Button> */}
+            授权给用户
+          </Button>
         </Space>
       ),
     },
   ];
+
+  // 
+  const rendeGrantrForm = () => (
+    <Form 
+      form={grantForm}
+      labelCol={{ span: 4 }}
+      labelWrap
+      wrapperCol={{ span: 20 }}
+    >
+      <Form.Item label="用户ID" name="userId" rules={[{ required: true }]}>
+        <Input/>
+      </Form.Item>
+      <Form.Item label="数量" name="quantity" rules={[{ required: true }]}>
+        <InputNumber/>
+      </Form.Item>
+    </Form>
+  )
 
   // 表格渲染函数
   const renderForm = () => {
@@ -439,6 +490,16 @@ const ScriptBot = (props) => {
           {renderForm()}
         </Modal>
       }
+      <Modal
+        title="授权给用户"
+        open={openGrantModal}
+        onOk={handleGrant}
+        confirmLoading={grantLoading}
+        onCancel={() => setOpenGrantModal(false)}
+      >
+        {rendeGrantrForm()}
+      </Modal>
+      
     </div>
   );
 };

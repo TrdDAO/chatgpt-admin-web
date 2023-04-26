@@ -18,7 +18,7 @@ env:
   IMAGE_REPO: ghcr.io/trddao/chatgpt-admin-dev
   IMAGE_NAME: chatgpt-admin-dev
   CHART_NAME: chatgpt-admin-dev
-  CHART_VERSION: 1.0.0-alpha
+  CHART_VERSION: 1.0.0
 
 permissions: write-all
 

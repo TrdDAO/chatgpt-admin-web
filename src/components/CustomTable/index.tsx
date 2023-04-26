@@ -149,7 +149,18 @@ const CustomTable: React.FC<CustomTableProps> = forwardRef((props, ref) => {
 		// 重新初始化表格
 		initTable: ()=>{
 			getTableData(null);
-		}
+		},
+		setData:(index:number, data:{[key:string]: any}) => {
+			const newSource = dataSource.map((item, _index) => {
+				if(_index === index) {
+					for(let [key, value] of Object.entries(data)) {
+						item[key] = value;
+					}
+				}
+				return item
+			})
+			setDataSource(newSource)
+		},
 	}))
 
 	useEffect(() => {
