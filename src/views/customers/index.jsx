@@ -324,7 +324,6 @@ const ScriptBot = (props) => {
               <Form.Item
                 label="密码"
                 name="password"
-                rules={[{ required: true }]}
               >
                 <Input/>
               </Form.Item>
@@ -334,7 +333,6 @@ const ScriptBot = (props) => {
             <Form.Item
               label="手机"
               name="phoneNumber"
-              rules={[{ required: true }]}
             >
               <Input/>
             </Form.Item>
@@ -343,6 +341,7 @@ const ScriptBot = (props) => {
             <Form.Item
               label="邮箱"
               name="emailAddress"
+              rules={[{ required: true }]}
             >
               <Input/>
             </Form.Item>
