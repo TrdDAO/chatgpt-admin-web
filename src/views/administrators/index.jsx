@@ -6,6 +6,7 @@ import {
   setAdministratorDisable,
   setAdministratorEnable,
   deleteAdministrator,
+  resetPassword,
 } from '@/service/administrators';
 import CustomTable from '@/components/CustomTable';
 import {
@@ -266,7 +267,7 @@ const ScriptBot = (props) => {
       title: "操作",
       dataIndex: "action",
       key: "action",
-      width: 310,
+      width: 350,
       fixed: 'right',
       render: (text, record, index) => (
         <Space>
@@ -283,6 +284,20 @@ const ScriptBot = (props) => {
             }}
           >
             编辑
+          </Button>
+          |
+          <Button
+            type="primary"
+            size="middle"
+            onClick={() => {
+              resetPassword(record.administratorId).then(() => {
+                messageApi.success('操作成功');
+              }).catch((msg) => {
+                messageApi.error(msg || '请求失败');
+              })
+            }}
+          >
+            重置密码
           </Button>
           |
           <Button

@@ -50,3 +50,10 @@ export const setCustomerEnable = (customerId) => {
     method: "put",
   });
 }
+
+export const resetPassword= (customerId) => {
+	return request({
+    url: `/api/admin/customers/${customerId}/reset-password`,
+    method: "put",
+  });
+}

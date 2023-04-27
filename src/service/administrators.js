@@ -51,3 +51,10 @@ export const setAdministratorEnable = (administratorId) => {
     method: "put",
   });
 }
+
+export const resetPassword= (administratorId) => {
+	return request({
+    url: `/api/admin/administrators/${administratorId}/reset-password`,
+    method: "put",
+  });
+}
