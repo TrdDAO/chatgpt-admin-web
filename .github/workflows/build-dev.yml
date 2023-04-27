@@ -18,7 +18,7 @@ env:
   IMAGE_REPO: ghcr.io/trddao/chatgpt-admin-dev
   IMAGE_NAME: chatgpt-admin-dev
   CHART_NAME: chatgpt-admin-dev
-  CHART_VERSION: 1.0.0-alpha
+  CHART_VERSION: 1.0.0
 
 permissions: write-all
 
@@ -86,4 +86,9 @@ jobs:
           sed -i "s,__REPLACE_IMAGE_NAME__,${IMAGE_REPO},g" ./charts/values.yaml
           helm plugin install https://github.com/chartmuseum/helm-push
           helm repo add trddao https://charts.miraclekang.com/ --username ${{ secrets.HELM_USERNAME }} --password ${{ secrets.HELM_PASSWORD }}
+          helm repo update trddao
+          VERSION=$(helm search repo trddao/${CHART_NAME} --devel | sed -n 2p | awk '{print $2}')
+          VERSION=$(if [ -z "$VERSION" ]; then echo "$CHART_VERSION"; else echo $VERSION; fi)
+          VERSION=$(echo -e "$VERSION\n$CHART_VERSION" | sort -V | tail -n 1)
+          CHART_VERSION=$(echo $VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           helm cm-push ./charts trddao --version ${CHART_VERSION} --app-version ${{ steps.commit.outputs.short }}
