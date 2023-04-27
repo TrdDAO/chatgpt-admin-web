@@ -7,3 +7,11 @@ export const loginReq = (data) => {
 		data,
   });
 }
+
+export const loginByPsd = (data) => {
+	return request({
+    url: `/api/open/auth/password`,
+    method: "post",
+		data,
+  });
+}
