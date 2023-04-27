@@ -140,7 +140,7 @@ const ScriptBot = (props) => {
   const handleEditForm = (record) => {
     getAdministratorDetail(record.administratorId).then((res) => {
       const settings = []; 
-      for(let [key, value] of Object.entries(res.profile.settings)) {
+      for(let [key, value] of Object.entries(res.profile.settings||{})) {
         settings.push({key, value})
       }
       res.profile.settings = settings;
