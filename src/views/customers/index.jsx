@@ -230,8 +230,8 @@ const ScriptBot = (props) => {
     },
     {
       title: "邮箱",
-      dataIndex: "email",
-      key: "email",
+      dataIndex: "emailAddress",
+      key: "emailAddress",
       width: 200,
     },
     {
