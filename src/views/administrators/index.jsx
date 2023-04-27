@@ -76,9 +76,9 @@ const ScriptBot = (props) => {
     // 先校验数据，再发起请求
     await form.validateFields();
     const formData = form.getFieldsValue();
+    console.log(formData)
     let requestData = {
       username: formData.username.trim(),
-      password: formData.password.trim(),
       phoneNumber: formData.phoneNumber.trim(),
       emailAddress: formData.emailAddress.trim(),
       profile: {
@@ -94,6 +94,7 @@ const ScriptBot = (props) => {
       },
     }
     if(!formId) {
+      requestData.password = formData.password;
       requestData.disabled = true;
     }
     // const settings = formData.profile.settings || {};

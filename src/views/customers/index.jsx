@@ -76,11 +76,9 @@ const ScriptBot = (props) => {
     // 先校验数据，再发起请求
     await form.validateFields();
     const formData = form.getFieldsValue();
-    
+    console.log(formData)
     let requestData = {
-      disabled: true,
       username: formData.username.trim(),
-      password: formData.password.trim(),
       phoneNumber: formData.phoneNumber.trim(),
       emailAddress: formData.emailAddress.trim(),
       profile: {
@@ -96,6 +94,7 @@ const ScriptBot = (props) => {
       },
     }
     if(!formId) {
+      requestData.password = formData.password;
       requestData.disabled = false;
     }
     const requestFn = formId ? editCustomer : addCustomer;
@@ -135,6 +134,11 @@ const ScriptBot = (props) => {
   // 编辑表单
   const handleEditForm = (record) => {
     getCustomerDetail(record.customerId).then((res) => {
+      const settings = []; 
+      for(let [key, value] of Object.entries(res.profile.settings)) {
+        settings.push({key, value})
+      }
+      res.profile.settings = settings;
       setFormId(record.customerId);
       setFormData(res);
       form.setFieldsValue(res);
