@@ -23,6 +23,7 @@ import {
   message,
   notification,
   Switch,
+  Popconfirm,
 } from "antd";
 import { PlusOutlined, DeleteOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -286,19 +287,27 @@ const ScriptBot = (props) => {
             编辑
           </Button>
           |
-          <Button
-            type="primary"
-            size="middle"
-            onClick={() => {
-              resetPassword(record.administratorId).then(() => {
-                messageApi.success('操作成功');
-              }).catch((msg) => {
-                messageApi.error(msg || '请求失败');
-              })
-            }}
+          <Popconfirm
+            placement="topRight"
+            title="提示"
+            description="新随机密码将发送到指定邮箱，确定重置密码?"
+            onConfirm={
+              () => {
+                resetPassword(record.administratorId).then(() => {
+                  messageApi.success('操作成功');
+                }).catch((msg) => {
+                  messageApi.error(msg || '请求失败');
+                })
+              }
+            }
           >
-            重置密码
-          </Button>
+            <Button
+              type="primary"
+              size="middle"
+            >
+              重置密码
+            </Button>
+          </Popconfirm>
           |
           <Button
             danger
