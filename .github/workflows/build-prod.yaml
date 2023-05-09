@@ -65,14 +65,14 @@ jobs:
             ${{ env.IMAGE_REPO }}:latest
             ${{ env.IMAGE_REPO }}:${{ github.ref_name }}
 
-      - name: Clean Old Images
-        uses: actions/delete-package-versions@v4
-        with:
-          package-type: 'container'
-          package-name: ${{ env.IMAGE_NAME }}
-          min-versions-to-keep: 10
-          ignore-versions: 'latest'
-          delete-only-pre-release-versions: "true"
+      # - name: Clean Old Images
+      #   uses: actions/delete-package-versions@v4
+      #   with:
+      #     package-type: 'container'
+      #     package-name: ${{ env.IMAGE_NAME }}
+      #     min-versions-to-keep: 10
+      #     ignore-versions: 'latest'
+      #     delete-only-pre-release-versions: "true"
 
       - name: Setup Helm
         uses: azure/setup-helm@v3
