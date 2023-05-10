@@ -13,3 +13,18 @@ export const getuserEquitieDetail = (userEquityId) => {
     method: "get",
   });
 }
+
+export const removeUserEquity = (userEquityId) => {
+  return request({
+    url: `/api/admin/equity/user-equities/${userEquityId}`,
+    method: "delete",
+  });
+}
+
+export const renewalUserEquity = (userEquityId, quantity) => {
+  return request({
+    url: `/api/admin/equity/user-equities/${userEquityId}/renewal`,
+    method: "put",
+    data: { renewalQty: quantity },
+  });
+}

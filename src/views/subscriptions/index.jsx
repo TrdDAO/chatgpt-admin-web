@@ -128,6 +128,7 @@ const ScriptBot = (props) => {
         type: "success",
         content: '授权成功',
       });
+      setOpenGrantModal(false);
     }).catch(() => {
       messageApi.open({
         type: "error",

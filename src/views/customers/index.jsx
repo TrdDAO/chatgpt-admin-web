@@ -1,34 +1,38 @@
+import CustomTable from '@/components/CustomTable';
 import { 
   getCustomers,
   getCustomerDetail,
   addCustomer,
   editCustomer,
   deleteCustomer,
+  resetPassword,
   setCustomerDisable,
   setCustomerEnable,
-  resetPassword,
 } from '@/service/customer';
-import CustomTable from '@/components/CustomTable';
+import {
+  removeUserEquity,
+  renewalUserEquity,
+} from '@/service/userEquities';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
   Col,
   Form,
   Input,
-  InputNumber,
   Modal,
+  Popconfirm,
   Row,
   Select,
   Space,
+  Switch,
   Table,
   message,
-  notification,
-  Switch,
-  Popconfirm,
+  notification
 } from "antd";
-import { PlusOutlined, DeleteOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import './index.less';
+import { InputNumber } from 'antd';
 
 
 // TODO
@@ -171,6 +175,41 @@ const ScriptBot = (props) => {
       }
     })
   };
+
+
+  const handleRemoveEquity = (equityId) => {
+    modalApi.confirm({
+      title: '提示',
+      content: '确认移除该权益？',
+      onOk:() => {
+        removeUserEquity(equityId).then(res => {
+          messageApi.open({
+            type: "success",
+            content: "移除成功",
+          });
+          tableRef.current.initTable();
+        })
+      }
+    })
+  }
+
+  const handleRenewalEquity = (equity) => {
+    modalApi.confirm({
+      title: '请输入续费周期',
+      content: <div>续费周期：<InputNumber min={1} defaultValue={1} /> {equity.unit}</div>,
+      onOk: () => {
+        const qty = document.querySelector('.ant-modal-body input').value;
+        console.log("Renewal qty: ", qty)
+        renewalUserEquity(equity.userEquityId, parseInt(qty, 10)).then(res => {
+          messageApi.open({
+            type: "success",
+            content: "续费成功",
+          });
+          tableRef.current.initTable();
+        })
+      }
+    })
+  }
 
   /**
    * 表头
@@ -519,8 +558,9 @@ const ScriptBot = (props) => {
               {title: '权益名', dataIndex: 'equityName', key: 'equityName', width: 100},
               {title: '权益ID', dataIndex: 'equityId', key: 'equityId', width: 200},
               {title: '类型', dataIndex: 'equityType', key: 'equityType', width: 50},
-              {title: '订阅周期', dataIndex: 'unit', key: 'unit', width: 100},
-              {title: '周期个数', dataIndex: 'quantity', key: 'quantity', width: 100},
+              {title: '订阅周期', dataIndex: ['unit', 'quantity'], key: 'unit', width: 100, render: (_, record) => {
+                return record.quantity + ' ' + record.unit
+              }},
               {title: '生效时间', dataIndex: 'effectiveTime', key: 'effectiveTime'},
               {title: '结束时间', dataIndex: 'expiresTime', key: 'expiresTime'},
               {title: '单次限制', dataIndex: 'equitie.maxTokensPerRequest', key: 'equitie.maxTokensPerRequest'},
@@ -529,6 +569,29 @@ const ScriptBot = (props) => {
               {title: '模型', dataIndex: 'equitie.chatModels', key: 'equitie.chatModels', render:(_, limitation) => {
                 return (<div>{_.join(' | ')}</div>)
               }},
+              {
+                title: "操作",
+                dataIndex: "action",
+                key: "action",
+                width: 180,
+                fixed: 'right',
+                render: (_, equity) => {
+                  return <Space>
+                    <Button type="primary" size="middle" onClick={() => {
+                      handleRenewalEquity(equity);
+                      setFormDisable(true);
+                    }}>
+                      续期
+                    </Button>
+                    <Button danger size="middle" onClick={() => {
+                      handleRemoveEquity(equity.userEquityId);
+                      setFormDisable(true);
+                    }}>
+                      删除
+                    </Button>
+                  </Space>
+                },
+              },
             ]
             return <Table bordered columns={columns} dataSource={record.equities} pagination={false} />;
           },

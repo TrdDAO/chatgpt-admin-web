@@ -6,7 +6,7 @@ import { logout } from "@/store/actions";
 
 //创建一个axios示例
 const service = axios.create({
-  baseURL: '//', // api 的 base_url
+  baseURL: process.env.REACT_APP_BASE_API, // api 的 base_url
   timeout: 0, // request timeout
   withCredentials: true,
 });
