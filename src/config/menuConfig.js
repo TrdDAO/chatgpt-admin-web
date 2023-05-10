@@ -19,15 +19,20 @@ const menuList = [
     icon: "bot"
   },
   {
+    title: "token使用量查询",
+    path: "/tokenAccounts",
+    icon: "bot"
+  },
+  {
     title: "订阅管理",
     path: "/subscriptions",
     icon: "user",
   },
-  // {
-  //   title: "用户权益查询",
-  //   path: "/userEquities",
-  //   icon: "user",
-  // },
+  {
+    title: "系统设置",
+    path: "/systemSetting",
+    icon: "system",
+  },
 ];
 
 export default menuList;

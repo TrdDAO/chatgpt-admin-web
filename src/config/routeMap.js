@@ -24,6 +24,13 @@ export default [
     })
   },
   {
+    path: "/tokenAccounts",
+    component: Loadable({
+      loader: () => import(/*webpackChunkName:'TokenAccounts'*/'@/views/tokenAccounts'),
+      loading: Loading,
+    })
+  },
+  {
     path: "/subscriptions",
     component: Loadable({
       loader: () => import(/*webpackChunkName:'Subscriptions'*/'@/views/subscriptions'),
@@ -34,6 +41,13 @@ export default [
     path: "/userEquities",
     component: Loadable({
       loader: () => import(/*webpackChunkName:'UserEquities'*/'@/views/userEquities'),
+      loading: Loading,
+    })
+  },
+  {
+    path: "/systemSetting",
+    component: Loadable({
+      loader: () => import(/*webpackChunkName:'UserEquities'*/'@/views/system'),
       loading: Loading,
     })
   },
