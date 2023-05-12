@@ -36,16 +36,22 @@ const TokenAccount = (props) => {
       width: 150,
     },
     {
-      title: "支付token",
-      dataIndex: "paidTokens",
-      key: "paidTokens",
-      ellipsis: true,
+      title: "模型",
+      dataIndex: "model",
+      key: "model",
+      width: 100,
+    },
+    {
+      title: "付费token",
+      dataIndex: "totalTokens",
+      key: "totalTokens",
       width: 150,
     },
     {
-      title: "总token",
-      dataIndex: "totalTokens",
-      key: "totalTokens",
+      title: "已支付token",
+      dataIndex: "paidTokens",
+      key: "paidTokens",
+      ellipsis: true,
       width: 150,
     },
     {
@@ -60,6 +66,7 @@ const TokenAccount = (props) => {
       dataIndex: "latestTokenUsedTimeString",
       key: "latestTokenUsedTimeString",
       ellipsis: true,
+      width: 150,
     },
     {
       title: "分钟使用",
@@ -111,6 +118,7 @@ const TokenAccount = (props) => {
               }
               item.latestTokenUsedTimeString = item.latestTokenUsedTime ? dayjs(item.latestTokenUsedTime).format('YYYY-MM-DD HH:mm:ss') : '';
               item.key = item.accountId;
+              console.log(item)
               return item
             })
             return Promise.resolve(res)
