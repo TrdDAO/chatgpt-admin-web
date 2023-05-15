@@ -55,7 +55,7 @@ module.exports = {
       // port: 8000, // 设置开发服务器端口
       proxy: {
         '/api': {
-          target: 'https://chat.miraclekang.com', // 'https://chatadm-dev.miraclekang.com' 'https://chat.miraclekang.com'
+          target: 'https://chatadm-dev.miraclekang.com', // 'https://chatadm-dev.miraclekang.com' 'https://chat.miraclekang.com'
           changeOrigin: true,
         }
       }

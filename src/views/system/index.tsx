@@ -22,7 +22,7 @@ const System: React.FC = (props) => {
 	const [darkUrl, setDarkUrl] = useState('');
   const [lightLoading, setLightLoading] = useState(false);
   const [darkLoading, setDarkLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const initPage = () => {
     getSystemProfile()
@@ -36,6 +36,8 @@ const System: React.FC = (props) => {
       })
       .catch(() => {
         message.error("获取信息失败");
+      }).finally(() => {
+        setLoading(false);
       });
   };
 
@@ -63,7 +65,6 @@ const System: React.FC = (props) => {
       scope: "PUBLIC",
     })
       .then((res) => {
-        console.log(res);
         // {
         //   fileId: "1105329944281890816";
         //   filename: "wechat_light.jpeg";
@@ -85,6 +86,10 @@ const System: React.FC = (props) => {
           systemProfileForm.setFieldValue('wechatGroupQRDarkImageFileId', res.fileId);
           setDarkUrl(res.previewUrl);
         }
+        message.success("更新成功");
+      })
+      .catch(() => {
+        message.success("更新失败");
       })
       .finally(() => {
         if (type === "light") {
