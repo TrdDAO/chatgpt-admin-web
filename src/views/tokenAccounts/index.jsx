@@ -24,73 +24,60 @@ const TokenAccount = (props) => {
       fixed: "left",
     },
     {
-      title: "ownerUserId",
-      dataIndex: "ownerUserId",
-      key: "ownerUserId",
-      width: 200,
-    },
-    {
-      title: "用户名",
+      title: "所属用户",
       dataIndex: "ownerUsername",
       key: "avataownerUsernamerUrl",
       width: 150,
     },
     {
-      title: "支付token",
-      dataIndex: "paidTokens",
-      key: "paidTokens",
-      ellipsis: true,
-      width: 150,
+      title: "模型",
+      dataIndex: "model",
+      key: "model",
+      width: 100,
     },
     {
-      title: "总token",
+      title: "付费token",
       dataIndex: "totalTokens",
       key: "totalTokens",
       width: 150,
     },
     {
-      title: "最近一次使用",
-      dataIndex: "tokenUsage.latestUsage",
-      key: "tokenUsage.latestUsage",
+      title: "已支付token",
+      dataIndex: "paidTokens",
+      key: "paidTokens",
       ellipsis: true,
-      width: 150,
+      width: 130,
     },
     {
       title: "最近使用时间",
       dataIndex: "latestTokenUsedTimeString",
       key: "latestTokenUsedTimeString",
       ellipsis: true,
+      width: 150,
     },
     {
-      title: "分钟使用",
-      dataIndex: "tokenUsage.minuteUsage",
-      key: "tokenUsage.minuteUsage",
+      title: "最近一次用量",
+      dataIndex: "tokenUsage.latestUsage",
+      key: "tokenUsage.latestUsage",
       ellipsis: true,
       width: 150,
     },
     {
-      title: "小时使用",
-      dataIndex: "tokenUsage.hourUsage",
-      key: "tokenUsage.hourUsage",
-      ellipsis: true,
-      width: 150,
-    },
-    {
-      title: "日使用",
+      title: "今日用量",
       dataIndex: "tokenUsage.dayUsage",
       key: "tokenUsage.dayUsage",
       ellipsis: true,
       width: 150,
     },
     {
-      title: "月使用",
+      title: "本月用量",
       dataIndex: "tokenUsage.monthUsage",
       key: "tokenUsage.monthUsage",
       ellipsis: true,
       width: 150,
     },
     {
-      title: "总使用",
+      title: "总用量",
       dataIndex: "tokenUsage.totalUsage",
       key: "tokenUsage.totalUsage",
       ellipsis: true,
@@ -111,6 +98,7 @@ const TokenAccount = (props) => {
               }
               item.latestTokenUsedTimeString = item.latestTokenUsedTime ? dayjs(item.latestTokenUsedTime).format('YYYY-MM-DD HH:mm:ss') : '';
               item.key = item.accountId;
+              console.log(item)
               return item
             })
             return Promise.resolve(res)
